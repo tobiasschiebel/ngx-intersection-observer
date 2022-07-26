@@ -1,27 +1,50 @@
-# NgxViewportWorkspace
+# ngx-intersection-observer
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.0.4.
+ Observe elements and get notified when they show up in the viewport.
 
-## Development server
+ ## Features
+ - Observe elements via IntersectionObserver API or fallback to scroll listener
+ - Threshold, how many precentage of the element need to be visible to trigger intersection
+ - Apply classes when element is in viewport
+ - Event binding for intersection 
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+ ## Install
 
-## Code scaffolding
+ ```shell
+ $ npm install --save  ngx-intersection-observer
+ ```
+ 
+**Import the module**
+```typescript
+//...
+import { NgxViewportModule } from 'ngx-viewport';
+@NgModule({
+  //...
+  imports: [
+    //...
+    NgxViewportModule
+  ],
+  //...
+})
+export class AppModule { }
+```
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+# Usage and Options
 
-## Build
+Name      | Type               | Options                                   | Optional
+---       | ---                | ---                                       | ---
+classes   | `String`           | Classes to apply on intersection          | Yes
+threshold | `Number`           | Precentage how many of the element needs to be visible to trigger intersection  | Yes
+useScroll | `Boolean`          | `true / false` If `true`, use scoll listener otherwhise use IntersectionObserver. By default IntersectionBehavior is used, fallback to scroll listener                     | Yes
+intersecting | `Event`           | Function to call on intersection | Yes
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+**Example**
 
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+```html
+<div appViewport
+     classes="animate animate_pulse"
+     [threshold]="0.3"
+     [useScroll="false"]
+     (intersecting)="someAction()">
+</div>
+````
