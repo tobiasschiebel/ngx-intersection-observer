@@ -8,7 +8,20 @@
   "dependencies": {
     "tslib": "^2.3.0"
   },
-  "repository": "tobiasschiebel/ngx-intersection-observer",  
+  "repository": "tobiasschiebel/ngx-intersection-observer",
   "license": "MIT",
-  "description": "Intersection observer for Angular"
+  "description": "Intersection observer for Angular",
+  "keywords": [   
+    "ngx",
+    "ngx-intersection-observer",    
+    "angular",   
+    "typescript",
+    "animate",
+    "animation"
+    "animate on scroll",
+    "intersection",
+    "viewport",
+    "animate.css",
+    "animate.style"
+  ]
 }
