@@ -18,7 +18,7 @@ export class IntersectionObserverModule {
     return {
       ngModule: IntersectionObserverModule,
       providers: [
-        { provide: IntersectionObserverConfig, useValue: config ? config : { debounce: 10 } as IntersectionObserverConfig },
+        { provide: IntersectionObserverConfig, useValue: config ? config : { debounce: 10, threshold: 30 } as IntersectionObserverConfig, multi: false },
         IntersectionObserverService
       ]
     };

@@ -2,6 +2,8 @@
   width: 300px;
   height: 300px;
   margin-top: 2000px;
+  border-width:10px;
+  border-style:solid;
 }
 
 .bg-red {
@@ -12,6 +14,14 @@
     background-color: blue;
 }
 
-.border{
-    border: 5px solid black;
+.bg-green {
+  background-color: green;
+}
+
+.border-green{
+    border-color: green;
+}
+
+.border-black {
+  border-color: black;
 }

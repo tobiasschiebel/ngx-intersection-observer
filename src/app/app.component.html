@@ -1,8 +1,8 @@
 
 
 <div intersectionObserver
-     [applyClass]="'bg-blue border'"
-     [keepClass]="'border'"
+     [addVisit]="'bg-green'"
+     [autoRemove]="true"
      [threshold]="30"
      [useScroll]="false"     
      (intersection)="intersect($event)"

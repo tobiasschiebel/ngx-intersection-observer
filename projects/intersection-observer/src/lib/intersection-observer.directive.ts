@@ -1,49 +1,53 @@
-import { Directive, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2 } from "@angular/core";
+import { Directive, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Optional, Output, Renderer2 } from "@angular/core";
 import { Subscription } from "rxjs";
+import { IntersectionObserverConfig } from "./intersection-observer-config.model";
 import { IntersectionObserverEvent } from "./intersection-observer-event.model";
 import { IntersectionObserverService } from "./intersection-observer.service";
 
 @Directive({
   selector: "[intersectionObserver]",
+  
 })
 export class IntersectionObserverDirective implements OnInit, OnDestroy {
 
   // Private fields
-  private viewportChangeSub: Subscription = new Subscription();
-  private _applyClasses: string[] = [];
-  private _keepClasses: string[] = [];
-  private classesApplyed: boolean = false;
-  private isVisible: boolean = false;
+  private _viewportChangeSub: Subscription = new Subscription();
+  private _addVisit: string[] = [];
+  private _addLeave: string[] = [];
+  private _removeVisit: string[] = [];
+  private _removeLeave: string[] = [];  
+  private _elementVisible: boolean = false;
+  private _hasClasses: boolean = false;
 
   // Directive inputs
-  @Input() applyClass: string | undefined; // Classes to apply when intersecting.
-  @Input() keepClass: string | undefined; // Specifies if the classes should be keept or removed when the element intersects.
-  @Input() useScroll?: boolean; // true = Scroll Listener, false = IntersectionObserver
-  @Input() threshold?: number; // Threshold, how many precentage of the element must be out of the viewport to treat it as invisible.
+  @Input() addVisit: string | undefined;     // Classes to apply when the element visits the viewport.
+  @Input() addLeave: string | undefined;     // Classes to apply when the element visits the viewport.
+  @Input() removeVisit: string | undefined   // Classes to remove whe the element visits the viewport
+  @Input() removeLeave: string | undefined   // Classes to remove when the element leaves the viewport.
+
+  @Input() useScroll: boolean | undefined     // true = Scroll Listener, false = IntersectionObserver
+  @Input() threshold: number | undefined;        // Threshold, how many precentage of the element must be out of the viewport to treat it as invisible.
+  @Input() autoRemove: boolean | undefined;    // true = Automatically remove classes from the element, false -> use removeLeave
 
   // Directive outputs
-  @Output() intersection: EventEmitter<IntersectionObserverEvent> = new EventEmitter<IntersectionObserverEvent>(); // Event that fires once an element intersects.
+  @Output() intersection: EventEmitter<IntersectionObserverEvent> =
+    new EventEmitter<IntersectionObserverEvent>(); // Event that fires once an element intersects.
 
   constructor(
     private element: ElementRef<any>,
     private renderer: Renderer2,
-    private intersectionObserverService: IntersectionObserverService) {
+    private intersectionObserverService: IntersectionObserverService,
+    @Optional() private intersectionObserverConfig?: IntersectionObserverConfig) {
   }
 
   ngOnInit(): void {
-    // Get all classes that should be set on intersection
-    this.applyClass?.split(" ").forEach(cls => {
-      if (cls.trim()) {
-        this._applyClasses.push(cls.trim());
-      }
-    });
 
-    // Get all classes that should stary after intersection
-    this.keepClass?.split(" ").forEach(cls => {
-      if (cls.trim()) {
-        this._keepClasses.push(cls.trim());
-      }
-    });
+    // Generate arrays of class stings
+    this._addVisit = this.getClassArray(this.addVisit ?? "");
+    this._addLeave = this.getClassArray(this.addLeave ?? "");
+    this._removeVisit = this.getClassArray(this.removeVisit ?? "");
+    this._removeLeave = this.getClassArray(this.removeLeave ?? "");
+    this._hasClasses = (this.addVisit || this.addLeave || this.removeVisit || this.removeLeave) ? true : false;
 
     // Identify which intersection mechanism should be used (IntersectionObserver or Scroll Listener)
     let useScroll = false;
@@ -54,20 +58,27 @@ export class IntersectionObserverDirective implements OnInit, OnDestroy {
       useScroll = this.useScroll!
     }
 
-    // Get threshold or default to 0.5
-    this.threshold = this.threshold ? this.threshold : 50;
+    // Get threshold or default to 30
+    let threshold = this.intersectionObserverConfig?.threshold ?
+      this.intersectionObserverConfig?.threshold : 30;
+    if (this.threshold == undefined) {
+      this.threshold = threshold;
+    }
+    else {
+      threshold = this.threshold;
+    }
 
     // using intersecting observer by default, else fallback to scroll Listener
     if ("IntersectionObserver" in window && !useScroll) {
       const options: IntersectionObserverInit = {
         root: null, // Use window as root
-        threshold: this.threshold / 100,
+        threshold: threshold / 100,
         rootMargin: "0px"
       };
       const observer: IntersectionObserver = new IntersectionObserver(
         (entries, _) => {
           entries.forEach((entry) => {
-            this.handleIntersecting(entry.isIntersecting);
+            this.handleIntersection(entry.isIntersecting);
           });
         },
         options
@@ -77,9 +88,25 @@ export class IntersectionObserverDirective implements OnInit, OnDestroy {
     }
 
     // Fallback to scroll listener
-    this.viewportChangeSub = this.intersectionObserverService.windowViewportChange$.subscribe(() =>
+    this._viewportChangeSub = this.intersectionObserverService.windowViewportChange$.subscribe(() =>
       this.checkForIntersection()
     );
+  }
+
+  /**
+   * Gets an array of classes.
+   * @param classString String with classes separated by whitespace.
+   * @returns An array with classes.
+   */
+  private getClassArray(classString: string): string[] {
+    let classes = new Array<string>();
+    classString.split(" ").forEach(cls => {
+      if (cls.trim()) {
+        classes.push(cls.trim());
+      }
+    });
+
+    return classes;
   }
 
   /**
@@ -90,7 +117,7 @@ export class IntersectionObserverDirective implements OnInit, OnDestroy {
     const thresholdPx = (this.elementHeight / 100) * this.threshold!;
     const scrollTriggerMax = this.offsetTop + thresholdPx - this.winHeight;
     const scrollTriggerMin = (this.offsetTop + (this.elementHeight - thresholdPx));
-    this.handleIntersecting(
+    this.handleIntersection(
       this.intersectionObserverService.pageYOffset >= scrollTriggerMax &&
       this.intersectionObserverService.pageYOffset <= scrollTriggerMin);
   }
@@ -100,8 +127,8 @@ export class IntersectionObserverDirective implements OnInit, OnDestroy {
    * @param intersect Determines if the elements intersects with its viewport or not.
    * @returns void
    */
-  private handleIntersecting(intersect: boolean): void {
-    this.isVisible = intersect;
+  private handleIntersection(intersect: boolean): void {
+    this._elementVisible = intersect;
     this.handleClasses();
     this.intersection.emit({ element: this.element, intersect: intersect } as IntersectionObserverEvent);
   }
@@ -112,33 +139,22 @@ export class IntersectionObserverDirective implements OnInit, OnDestroy {
    * */
   private handleClasses(): void {
     // No classes, skip
-    if (!this._applyClasses)
+    if (!this._hasClasses)
       return;
 
-    // Element visible and no classes applied yet -> Apply classes
-    if (this.isVisible && !this.classesApplyed) {
-      this.addClasses(this._applyClasses);
-      this.classesApplyed = true;
+    if (this._elementVisible) {
+      this.addClasses(this._addVisit);
+      if (this.autoRemove) {
+        this.removeClasses(this._addLeave);
+      }
+      this.removeClasses(this._removeVisit);
     }
-
-    // Element is not visible, but classes have been assigned and no classes to keep -> remove all classes
-    if (!this.isVisible && this.classesApplyed && !this.keepClass) {
-      this.removeClasses(this._applyClasses);
-      this.classesApplyed = false;
-    }
-
-    // Element is not visible and classes have been assigned but there are classes to keep -> remove all but keep classes
-    if (!this.isVisible && this.classesApplyed && this.keepClass) {
-      let removeClasses = this._applyClasses.concat(this._keepClasses);
-      this._applyClasses.forEach(cls => {
-        if (this._keepClasses.find(t => t == cls)) {
-          removeClasses = removeClasses.filter(t => t != cls);
-        }
-      });
-      removeClasses.forEach(cls => {
-        this.renderer.removeClass(this.element.nativeElement, cls);
-      });
-      this.classesApplyed = false;
+    else {
+      this.addClasses(this._addLeave);
+      if (this.autoRemove) {
+        this.removeClasses(this._addVisit);
+      }
+      this.removeClasses(this._removeLeave)
     }
   }
 
@@ -153,7 +169,7 @@ export class IntersectionObserverDirective implements OnInit, OnDestroy {
         this.renderer.addClass(this.element.nativeElement, cls);
       }
     });
-  }
+  }  
 
   /**
   * Helper to remove a list of classes from the element.
@@ -199,6 +215,6 @@ export class IntersectionObserverDirective implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.viewportChangeSub.unsubscribe();
+    this._viewportChangeSub.unsubscribe();
   }
 }

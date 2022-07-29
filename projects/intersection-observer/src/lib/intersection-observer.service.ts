@@ -19,11 +19,12 @@ export class IntersectionObserverService implements OnDestroy {
   private resizeSub: Subscription;
   private viewportChangeSub: Subscription;
 
-  constructor(@Optional() config?: IntersectionObserverConfig) {
+  constructor(@Optional() private intersectionObserverConfig?: IntersectionObserverConfig) {
 
     // Get the config or default
-    this._config = config ? config : {
-      debounce: 10
+    this._config = intersectionObserverConfig ? intersectionObserverConfig : {
+      debounce: 10,
+      threshold: 20
     } as IntersectionObserverConfig;
 
     // Manage scroll position initially
@@ -34,7 +35,7 @@ export class IntersectionObserverService implements OnDestroy {
       typeof window !== "undefined" ? fromEvent(window, "scroll") : EMPTY;
     this.scrollSub = this.onScroll$
       .pipe(
-        debounceTime(this.config.debounce),
+        debounceTime(this._config.debounce),
         distinctUntilChanged())
       .subscribe(t => {
         this.manageScrollPos();
@@ -46,7 +47,7 @@ export class IntersectionObserverService implements OnDestroy {
       typeof window !== "undefined" ? fromEvent(window, "resize") : EMPTY;
     this.resizeSub = this.onResize$
       .pipe(
-        debounceTime(this.config.debounce),
+        debounceTime(this._config.debounce),
         distinctUntilChanged())
       .subscribe(t => {
         this.manageScrollPos();
