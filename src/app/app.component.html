@@ -1,0 +1,10 @@
+
+
+<div intersectionObserver
+     [applyClass]="'bg-blue border'"
+     [keepClass]="'border'"
+     [threshold]="30"
+     [useScroll]="false"     
+     (intersection)="intersect($event)"
+     class="bg-red"
+     id="my-div"></div>

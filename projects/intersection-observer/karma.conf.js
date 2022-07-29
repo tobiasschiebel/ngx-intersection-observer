@@ -25,7 +25,7 @@ module.exports = function (config) {
       suppressAll: true // removes the duplicated traces
     },
     coverageReporter: {
-      dir: require('path').join(__dirname, '../../coverage/ngx-viewport'),
+      dir: require('path').join(__dirname, '../../coverage/intersection-observer'),
       subdir: '.',
       reporters: [
         { type: 'html' },
