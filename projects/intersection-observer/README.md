@@ -15,7 +15,7 @@
 
  ngx-intersection-observer | Angular
  ---                       | ---
- 1.0.11                     | 14.x
+ 1.0.11                     | >=13.x
 
  ## Install
 
@@ -31,13 +31,21 @@ Import the module to your angular application
 ```typescript
 //...
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
+
 @NgModule({
-  //...
-  imports: [
-    //...
-    IntersectionObserverModule.forRoot()
+  declarations: [
+    AppComponent
   ],
-  //...
+  imports: [
+    BrowserModule,
+    IntersectionObserverModule.forRoot({
+      debounce: 50,
+      threshold: 30,
+      autoRemove: true
+    } as IntersectionObserverConfig)
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
 })
 export class AppModule { }
 ```
@@ -53,7 +61,7 @@ leaveClass       | `String`   | List of classes to apply, when the element leave
 removeVisitClass | `String`   | List of classes to remove, when the element visits the window viewport.
 removeLeaveClass | `String`   | List of classes to remove, when the element leaves the windows viewport. | Yes
 autoRemove       | `Boolean`  | `true / false` If `true` classes will be removed automatically when the element leaves the viewport, otherwhise use removeVisitClass property. | Yes | true
-useScroll        | `Boolean`  | `true / false` If `true`, use scoll listener otherwhise use IntersectionObserver. By default IntersectionBehavior is used, fallback to scroll listener.  | Yes | False
+useScroll        | `Boolean`  | `true / false` If `true`, use scoll listener otherwhise use IntersectionObserver. By default IntersectionBehavior is used, fallback to scroll listener.  | Yes | true
 threshold        | `Number`   | Specifies how many precentage of the element need to be visible in the viewport to treat it as intersection. Specify a value between 0% and 100%         | Yes | 30%
 intersection     | `Event`    | Function which is called when the element enters/leaves the viewport.                                                                                     | Yes
 

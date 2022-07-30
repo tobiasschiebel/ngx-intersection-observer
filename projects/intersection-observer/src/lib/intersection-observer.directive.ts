@@ -6,7 +6,7 @@ import { IntersectionObserverService } from "./intersection-observer.service";
 
 @Directive({
   selector: "[intersectionObserver]",
-  
+
 })
 export class IntersectionObserverDirective implements OnInit, OnDestroy {
 
@@ -15,7 +15,7 @@ export class IntersectionObserverDirective implements OnInit, OnDestroy {
   private _visitClass: string[] = [];
   private _leaveClass: string[] = [];
   private _removeVisitClass: string[] = [];
-  private _removeLeaveClass: string[] = [];  
+  private _removeLeaveClass: string[] = [];
   private _elementVisible: boolean = false;
   private _hasClasses: boolean = false;
 
@@ -67,6 +67,10 @@ export class IntersectionObserverDirective implements OnInit, OnDestroy {
     else {
       threshold = this.threshold;
     }
+
+    // Auto remove
+    this.autoRemove = this.intersectionObserverConfig?.autoRemove ?
+      this.intersectionObserverConfig?.autoRemove : true;
 
     // using intersecting observer by default, else fallback to scroll Listener
     if ("IntersectionObserver" in window && !useScroll) {
@@ -169,7 +173,7 @@ export class IntersectionObserverDirective implements OnInit, OnDestroy {
         this.renderer.addClass(this.element.nativeElement, cls);
       }
     });
-  }  
+  }
 
   /**
   * Helper to remove a list of classes from the element.
