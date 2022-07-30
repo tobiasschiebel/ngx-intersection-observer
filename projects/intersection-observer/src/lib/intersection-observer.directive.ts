@@ -12,22 +12,22 @@ export class IntersectionObserverDirective implements OnInit, OnDestroy {
 
   // Private fields
   private _viewportChangeSub: Subscription = new Subscription();
-  private _addVisit: string[] = [];
-  private _addLeave: string[] = [];
-  private _removeVisit: string[] = [];
-  private _removeLeave: string[] = [];  
+  private _visitClass: string[] = [];
+  private _leaveClass: string[] = [];
+  private _removeVisitClass: string[] = [];
+  private _removeLeaveClass: string[] = [];  
   private _elementVisible: boolean = false;
   private _hasClasses: boolean = false;
 
   // Directive inputs
-  @Input() addVisit: string | undefined;     // Classes to apply when the element visits the viewport.
-  @Input() addLeave: string | undefined;     // Classes to apply when the element visits the viewport.
-  @Input() removeVisit: string | undefined   // Classes to remove whe the element visits the viewport
-  @Input() removeLeave: string | undefined   // Classes to remove when the element leaves the viewport.
+  @Input() visitClass: string | undefined;         // Classes to apply when the element visits the viewport.
+  @Input() leaveClass: string | undefined;         // Classes to apply when the element visits the viewport.
+  @Input() removeVisitClass: string | undefined    // Classes to remove whe the element visits the viewport
+  @Input() removeLeaveClass: string | undefined    // Classes to remove when the element leaves the viewport.
 
-  @Input() useScroll: boolean | undefined     // true = Scroll Listener, false = IntersectionObserver
-  @Input() threshold: number | undefined;        // Threshold, how many precentage of the element must be out of the viewport to treat it as invisible.
-  @Input() autoRemove: boolean | undefined;    // true = Automatically remove classes from the element, false -> use removeLeave
+  @Input() useScroll: boolean | undefined          // true = Scroll Listener, false = IntersectionObserver
+  @Input() threshold: number | undefined;          // Threshold, how many precentage of the element must be out of the viewport to treat it as invisible.
+  @Input() autoRemove: boolean | undefined;        // true = Automatically remove classes from the element, false -> use removeLeaveClass
 
   // Directive outputs
   @Output() intersection: EventEmitter<IntersectionObserverEvent> =
@@ -43,11 +43,11 @@ export class IntersectionObserverDirective implements OnInit, OnDestroy {
   ngOnInit(): void {
 
     // Generate arrays of class stings
-    this._addVisit = this.getClassArray(this.addVisit ?? "");
-    this._addLeave = this.getClassArray(this.addLeave ?? "");
-    this._removeVisit = this.getClassArray(this.removeVisit ?? "");
-    this._removeLeave = this.getClassArray(this.removeLeave ?? "");
-    this._hasClasses = (this.addVisit || this.addLeave || this.removeVisit || this.removeLeave) ? true : false;
+    this._visitClass = this.getClassArray(this.visitClass ?? "");
+    this._leaveClass = this.getClassArray(this.leaveClass ?? "");
+    this._removeVisitClass = this.getClassArray(this.removeVisitClass ?? "");
+    this._removeLeaveClass = this.getClassArray(this.removeLeaveClass ?? "");
+    this._hasClasses = (this.visitClass || this.leaveClass || this.removeVisitClass || this.removeLeaveClass) ? true : false;
 
     // Identify which intersection mechanism should be used (IntersectionObserver or Scroll Listener)
     let useScroll = false;
@@ -143,18 +143,18 @@ export class IntersectionObserverDirective implements OnInit, OnDestroy {
       return;
 
     if (this._elementVisible) {
-      this.addClasses(this._addVisit);
+      this.addClasses(this._visitClass);
       if (this.autoRemove) {
-        this.removeClasses(this._addLeave);
+        this.removeClasses(this._leaveClass);
       }
-      this.removeClasses(this._removeVisit);
+      this.removeClasses(this._removeVisitClass);
     }
     else {
-      this.addClasses(this._addLeave);
+      this.addClasses(this._leaveClass);
       if (this.autoRemove) {
-        this.removeClasses(this._addVisit);
+        this.removeClasses(this._visitClass);
       }
-      this.removeClasses(this._removeLeave)
+      this.removeClasses(this._removeLeaveClass)
     }
   }
 

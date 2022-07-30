@@ -1,14 +1,13 @@
 # ngx-intersection-observer
 
- Observe visiblity of elements and get notified when they enter/leave the window viewport.
+ Observe visiblity of elements and get notified when they visit/leave the window viewport.
 
  ## Features
  - Observe elements via IntersectionObserver API or fallback to scroll listener to detect if the element enters/leaves the viewport.
- - Apply classes when the element enters the viewport.
- - Specify which classes should be keept when entering/leaving the viewport.
+ - Apply or remove classes based on element visiblity
  - Specify threshold, how many precentage of the element need to be visible to trigger intersection.
  - Specify intersection method (IntersectionObserver API or scroll listener)
- - Event binding for intersecting elements. 
+ - Event binding for intersecting elements.
 
  ## Dependencies
 
@@ -16,7 +15,7 @@
 
  ngx-intersection-observer | Angular
  ---                       | ---
- 1.0.7                     | 14.x
+ 1.0.11                     | 14.x
 
  ## Install
 
@@ -47,19 +46,22 @@ export class AppModule { }
 
 ---
 
-Name          | Type       | Options                                                                                                                                                  | Optional
----           | ---        | ---                                                                                                                                                      | ---
-applyClass    | `String`   | List of classes to apply when the element gets visible within the viewport. Those classes will be removed when the element leaves the viewport.          | Yes
-keepClass     | `String`   | List of classes to keep when the element leaves the viewport and enters it again.                                                                        | Yes
-useScroll     | `Boolean`  | `true / false` If `true`, use scoll listener otherwhise use IntersectionObserver. By default IntersectionBehavior is used, fallback to scroll listener.  | Yes
-threshold     | `Number`   | Specifies how many precentage of the element need to be visible in the viewport to treat it as intersection. Specify a value between 0% and 100%         | Yes
-intersection  | `Event`    | Function which is called when the element enters/leaves the viewport.                                                                                     | Yes
+Name             | Type       | Description                                                                                                                                                  | Optional | Default
+---              | ---        | ---                                                                                                                                                      | --- | ---
+visitClass       | `String`   | List of classes to apply, when the element visits the windows viewport.        | Yes
+leaveClass       | `String`   | List of classes to apply, when the element leaves the window viewport.                                                                  | Yes
+removeVisitClass | `String`   | List of classes to remove, when the element visits the window viewport.
+removeLeaveClass | `String`   | List of classes to remove, when the element leaves the windows viewport. | Yes
+autoRemove       | `Boolean`  | `true / false` If `true` classes will be removed automatically when the element leaves the viewport, otherwhise use removeVisitClass property. | Yes | true
+useScroll        | `Boolean`  | `true / false` If `true`, use scoll listener otherwhise use IntersectionObserver. By default IntersectionBehavior is used, fallback to scroll listener.  | Yes | False
+threshold        | `Number`   | Specifies how many precentage of the element need to be visible in the viewport to treat it as intersection. Specify a value between 0% and 100%         | Yes | 30%
+intersection     | `Event`    | Function which is called when the element enters/leaves the viewport.                                                                                     | Yes
 
 **Example**
 ```html
 <div intersectionObserver
-     [applyClass]="'bg-blue border'"
-     [keepClass]="'border'"
+     [visitClass]="'bg-blue border'"
+     [autoRemove]="true"
      [threshold]="30"
      [useScroll]="false"     
      (intersection)="intersect($event)"
@@ -103,8 +105,8 @@ If you want to apply animations from animate.style, i recomment to use the follo
 **Example**
 ```html
 <div intersectionObserver
-     [applyClass]="'bg-blue border'"
-     [keepClass]="'border'"
+     [visitClass]="'bg-blue border'"
+     [autoRemove]="true"
      [threshold]="30"
      [useScroll]="false"     
      (intersection)="intersect($event)"
@@ -112,8 +114,6 @@ If you want to apply animations from animate.style, i recomment to use the follo
      id="my-div"></div>
 </div>
 ```
-
-Ive build my portfolio website <https://www.t-schiebel.de> with this library, you can check it out in order to see it in action. It uses animate.css for all the animations. The animate.css classes get applied when the element visits the viewport.
 
 ## License
 
@@ -123,7 +123,7 @@ MIT
 
 ---
 
-> GitHub [@tobiasschiebel](https://github.com/tobiasschiebel) &nbsp;&middot;&nbsp;
+> GitHub [@tobiasschiebel](https://github.com/tobiasschiebel) | Twitter [@SchiebelTobias](https://twitter.com/SchiebelTobias)
 
 
 
