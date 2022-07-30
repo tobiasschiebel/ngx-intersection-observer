@@ -1,10 +1,8 @@
 
 
 <div intersectionObserver
-     [visitClass]="'bg-green'"
+     visitClass="animate__animated animate__bounce"
      [autoRemove]="true"
-     [threshold]="30"
-     [useScroll]="false"     
      (intersection)="intersect($event)"
-     class="bg-red"
+     class="bg-red hide-on-init"
      id="my-div"></div>

@@ -5,4 +5,6 @@ export class IntersectionObserverConfig {
   threshold: number = 30;
   /** Automatically remove classes from the element. */
   autoRemove: boolean = true;
+  /**  Scroll Listener, false = IntersectionObserver */
+  useScroll: boolean = false;
 }

@@ -25,3 +25,11 @@
 .border-black {
   border-color: black;
 }
+
+.hide-on-init {
+  visibility: hidden;
+}
+
+.animate__animated {
+  visibility: visible !important;
+}

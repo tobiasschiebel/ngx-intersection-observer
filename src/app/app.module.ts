@@ -14,7 +14,8 @@ import { AppComponent } from './app.component';
     IntersectionObserverModule.forRoot({
       debounce: 50,
       threshold: 30,
-      autoRemove: true
+      autoRemove: false,
+      useScroll: false
     } as IntersectionObserverConfig)
   ],
   providers: [],

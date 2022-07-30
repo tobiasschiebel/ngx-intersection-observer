@@ -1,5 +1,5 @@
 import { Directive, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Optional, Output, Renderer2 } from "@angular/core";
-import { Subscription } from "rxjs";
+import { config, Subscription } from "rxjs";
 import { IntersectionObserverConfig } from "./intersection-observer-config.model";
 import { IntersectionObserverEvent } from "./intersection-observer-event.model";
 import { IntersectionObserverService } from "./intersection-observer.service";
@@ -49,28 +49,21 @@ export class IntersectionObserverDirective implements OnInit, OnDestroy {
     this._removeLeaveClass = this.getClassArray(this.removeLeaveClass ?? "");
     this._hasClasses = (this.visitClass || this.leaveClass || this.removeVisitClass || this.removeLeaveClass) ? true : false;
 
-    // Identify which intersection mechanism should be used (IntersectionObserver or Scroll Listener)
-    let useScroll = false;
-    if (this.useScroll == undefined) {
-      useScroll = false;
-    }
-    else {
-      useScroll = this.useScroll!
-    }
+    // Identify which intersection mechanism should be used
+    // (IntersectionObserver or Scroll Listener) default IntersectionObserver
+    let useScroll = this.intersectionObserverConfig?.useScroll;
+    useScroll = useScroll == undefined ? false : useScroll;
+    useScroll = this.useScroll == undefined ? useScroll : this.useScroll;   
 
     // Get threshold or default to 30
-    let threshold = this.intersectionObserverConfig?.threshold ?
-      this.intersectionObserverConfig?.threshold : 30;
-    if (this.threshold == undefined) {
-      this.threshold = threshold;
-    }
-    else {
-      threshold = this.threshold;
-    }
+    let threshold = this.intersectionObserverConfig?.threshold;
+    threshold = threshold == undefined ? 30 : threshold;
+    threshold = this.threshold == undefined ? threshold : this.threshold;   
 
     // Auto remove
-    this.autoRemove = this.intersectionObserverConfig?.autoRemove ?
-      this.intersectionObserverConfig?.autoRemove : true;
+    let autoRemove = this.intersectionObserverConfig?.autoRemove;
+    autoRemove = autoRemove == undefined ? true : autoRemove;
+    autoRemove = this.autoRemove == undefined ? autoRemove : this.autoRemove;
 
     // using intersecting observer by default, else fallback to scroll Listener
     if ("IntersectionObserver" in window && !useScroll) {

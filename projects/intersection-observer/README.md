@@ -15,7 +15,7 @@
 
  ngx-intersection-observer | Angular
  ---                       | ---
- 1.0.11                     | >=13.x
+ 1.0.13                    | >=13.x
 
  ## Install
 
@@ -103,13 +103,16 @@ intersection     | `Event`    | Function which is called when the element enters
 
 Animate.css is a library of ready-to-use, cross-browser animations for use in your web projects. Great for emphasis, home pages, sliders, and attention-guiding hints. <https://animate.style/>
 
-If you want to apply animations from animate.style, i recomment to use the following css class on your element to prevent flickering.
+If you want to apply animations from animate.style, use those two classes to prevent flickering.
 ```css
 .hide-on-init {
   visibility: hidden;
 }
-```
 
+.animate__animated {
+  visibility: visible !important;
+}
+```
 **Example**
 ```html
 <div intersectionObserver
